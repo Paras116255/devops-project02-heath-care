@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: webserver
+  template:
+    metadata:
+      labels:
+        type: webserver
+    spec:
+      containers:
+        - name: c1
+          image: paras1112/myimage:project2

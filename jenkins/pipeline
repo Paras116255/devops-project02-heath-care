@@ -1,0 +1,49 @@
+pipeline{
+    agent none
+    tools{
+        maven 'mymaven'
+    }
+    
+    stages{
+        stage('Checkout code'){
+            agent any
+            steps{
+                git 'https://github.com/Paras116255/health-care-project002-devops.git'
+            }
+        }
+        stage('Package code'){
+            agent any
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('Build Image'){
+            agent any
+            steps{
+                sh 'docker build -t myimage:project2 .'
+            }
+        }
+        stage('push the image to docker hub'){
+            agent any
+            steps{
+                withCredentials([string(credentialsId: 'DOCKER_HUB_PASWD', variable: 'DOCKER_HUB_PASWD')]) {
+                sh 'docker login -u paras1112 -p ${DOCKER_HUB_PASWD}'
+                }
+                sh 'docker tag myimage:project2 paras1112/myimage:project2'
+                sh 'docker push paras1112/myimage:project2'
+            }
+        }
+         stage('Deploy on Test server')
+        {
+            agent {
+                label 'test_server'
+                
+            }
+            steps{
+                sh 'docker run -d -P paras1112/myimage:project2 '
+            }
+        }
+
+    }
+    
+}

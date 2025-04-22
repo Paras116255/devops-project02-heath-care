@@ -1,0 +1,16 @@
+- name: Install and set up test server
+  hosts: webserver
+  become: true
+  tasks:
+    - name: Update the apt repo
+      command: apt-get update
+    - name: Install multiple packages
+      package: name={{item}} state=present
+      loop:
+        - git
+        - docker.io
+        - openjdk-17-jdk
+    - name: start Jenkins and docker service
+      service: name={{item}} state=started
+      loop:
+        - docker
